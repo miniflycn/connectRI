@@ -1,10 +1,7 @@
 {
 	"maxAge": 3600,
 	"port": 3000,
-	"proxy": {
-		"host": "www.baidu.com",
-		"port": 80
-	},
+	"proxy": "http://www.baidu.com",
 	"prototype": {
 		"path": "/prototype",
 		"root": "C:/Radica/RI/manggis_web/src/main/webapp/prototype"
@@ -14,6 +11,7 @@
 		"root": "C:/Radica/RI/manggis_web/src/main/webapp/static"
 	},
 	"devDependencies": {
-		"connect": "~2.8.4"
+		"connect": "~2.8.4",
+		"proxy-middleware": "~0.4.0"
 	}
 }

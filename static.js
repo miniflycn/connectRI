@@ -4,6 +4,7 @@ module.exports = (function(){
 		http = require('http'),
 		url = require('url'),
 		path = require('path'),
+		proxy = require('proxy-middleware'),
 		fs = require('fs'),
 		pkg = JSON.parse(fs.readFileSync('./package.json'));
 
@@ -28,7 +29,7 @@ module.exports = (function(){
 			var urlObj = url.parse(pkg.prototype.root + req.originalUrl.replace(pkg.prototype.path, '')),
 				filePath = urlObj.protocol + urlObj.pathname,
 				contentType = _getType(path.extname(urlObj.pathname)),
-				method = urlObj.query.match(/\_method\=([a-z]+)($|\&)/)[1],
+				method = req.method.toLowerCase(),
 				methodFilePath = filePath.replace(/(\.xhtml|\.html|\.json)$/, '.' + method + '$1');
 
 			fs.exists(methodFilePath, function(exist){
@@ -44,21 +45,6 @@ module.exports = (function(){
 			});
 		})
 		.use(pkg.prototype.path, connect.static(pkg.prototype.root, {maxAge: pkg.maxAge}))
-		.use(function(req, res){
-			var opts = {
-				host: pkg.proxy.host,
-				port: pkg.proxy.port,
-				path: req.url,
-				method: 'GET'
-			};
-			http.get(opts, function(response){
-				response.on('data', function(chunk){
-					res.write(chunk);
-				});
-				response.on('end', function(){
-					res.end()
-				});
-			});
-		})
+		.use(proxy(url.parse(pkg.proxy)))
 		.listen(pkg.port, function(){console.log('Connect with: http://127.0.0.1:' + pkg.port)});
 })();
